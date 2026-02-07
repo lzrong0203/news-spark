@@ -29,9 +29,7 @@ class VideoMaterial(BaseModel):
     topic: str = Field(description="研究主題")
     title_suggestion: str = Field(description="建議標題")
     hook_line: str = Field(description="開場 hook（前 0-3 秒吸引注意力）")
-    key_talking_points: list[str] = Field(
-        description="主要論點（3-5 個重點）"
-    )
+    key_talking_points: list[str] = Field(description="主要論點（3-5 個重點）")
 
     # 視覺建議
     visual_suggestions: list[str] = Field(
@@ -39,12 +37,8 @@ class VideoMaterial(BaseModel):
     )
 
     # 分析指標
-    viral_score: float = Field(
-        ge=0.0, le=1.0, description="病毒傳播潛力分數 (0-1)"
-    )
-    target_emotion: str = Field(
-        description="目標情緒反應（幽默/震驚/啟發/憤怒/感動）"
-    )
+    viral_score: float = Field(ge=0.0, le=1.0, description="病毒傳播潛力分數 (0-1)")
+    target_emotion: str = Field(description="目標情緒反應（幽默/震驚/啟發/憤怒/感動）")
     controversy_level: str = Field(
         default="medium",
         description="爭議程度（low/medium/high）",
@@ -52,9 +46,7 @@ class VideoMaterial(BaseModel):
 
     # 行動呼籲
     call_to_action: str = Field(description="行動呼籲文字")
-    hashtag_suggestions: list[str] = Field(
-        description="建議 hashtags"
-    )
+    hashtag_suggestions: list[str] = Field(description="建議 hashtags")
 
     # 多平台變體
     platform_variants: list[PlatformVariant] = Field(
@@ -62,9 +54,7 @@ class VideoMaterial(BaseModel):
     )
 
     # 來源參考
-    sources: list[SourceItem] = Field(
-        default_factory=list, description="資料來源"
-    )
+    sources: list[SourceItem] = Field(default_factory=list, description="資料來源")
 
     # 額外元資料
     generated_at: str = Field(description="生成時間")
