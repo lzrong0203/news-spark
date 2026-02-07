@@ -143,12 +143,12 @@ cp .env.example .env
 | 變數 | 說明 | 範例 |
 |------|------|------|
 | `OPENAI_API_KEY` | OpenAI API Key | `sk-xxx` |
-| `NEWSAPI_KEY` | [NewsAPI](https://newsapi.org/) Key | `xxx` |
 
 ### 選用
 
 | 變數 | 說明 | 預設值 |
 |------|------|--------|
+| `NEWSAPI_KEY` | [NewsAPI](https://newsapi.org/) Key（未設定則僅使用 Google News）| — |
 | `ANTHROPIC_API_KEY` | Anthropic API Key（使用 Anthropic 時必填）| — |
 | `LLM_PROVIDER` | LLM 提供者 | `openai` |
 | `LLM_MODEL` | 模型名稱 | `gpt-4o-mini` |
@@ -204,6 +204,29 @@ uv run ruff format .
 | [httpx](https://www.python-httpx.org/) | 非同步 HTTP 客戶端 |
 | [feedparser](https://feedparser.readthedocs.io/) | RSS 解析 |
 | [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/) | HTML 解析 |
+
+## 已知限制與改進方向
+
+### 資料來源（重點改進項目）
+
+目前穩定可用的資料來源有限，是影響研究品質的主要瓶頸：
+
+| 來源 | 狀態 | 問題 |
+|------|------|------|
+| Google News RSS | 穩定 | 僅取得標題，無法讀取新聞內文 |
+| NewsAPI | 需付費 API Key | 免費方案有嚴格限制 |
+| PTT | 穩定 | 僅搜尋 3 個看板最近 3 頁，冷門主題容易回傳 0 筆 |
+| Threads | 不穩定 | Meta 反爬蟲機制，經常回傳 0 筆 |
+| LinkedIn | 未接通 | 需使用者手動提供 URL，UI 尚無入口 |
+
+#### 改進計劃
+
+- [ ] **新增網頁搜尋來源** — 整合 Google Search API 或 SerpAPI 作為 fallback
+- [ ] **Google News 全文抓取** — 透過 RSS 連結追蹤到原始新聞網站，擷取完整內文
+- [ ] **擴大 PTT 搜尋範圍** — 支援更多看板、增加頁數、或改用 PTT 搜尋功能
+- [ ] **Reddit 支援** — 新增 Reddit scraper，提供英文論壇來源
+- [ ] **YouTube 字幕抓取** — 搜尋相關 YouTube 影片並擷取字幕作為分析素材
+- [ ] **使用者自訂來源** — 允許使用者提供 URL 列表進行分析
 
 ## License
 

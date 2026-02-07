@@ -610,19 +610,38 @@ if request and not st.session_state.is_running:
     st.session_state.is_running = True
     st.session_state.research_result = None
 
-    with st.spinner("研究進行中... 這可能需要一些時間"):
-        try:
-            result = _run_async(
-                run_research(
-                    {
-                        "request": request,
-                        "execution_log": [],
-                        "total_sources_scraped": 0,
-                    }
-                )
+    status = st.status(
+        "🚀 研究進行中... 預計約 50 秒", expanded=True
+    )
+    status.write("🔍 分解查詢 → 📰 抓取資料 → 🧠 深度分析 → 🎬 生成素材")
+
+    try:
+        result = _run_async(
+            run_research(
+                {
+                    "request": request,
+                    "execution_log": [],
+                    "total_sources_scraped": 0,
+                }
             )
-            st.session_state.research_result = result
-            video_mat = result.get("video_material")
+        )
+
+        # 將執行日誌寫入 status 容器
+        for log in result.get("execution_log", []):
+            status.write(f"- {log}")
+
+        if result.get("current_step") == "error":
+            status.update(label="❌ 研究未能完成", state="error", expanded=True)
+        else:
+            status.update(
+                label="✅ 研究完成！", state="complete", expanded=False
+            )
+
+        st.session_state.research_result = result
+
+        # 只在成功時儲存歷史
+        video_mat = result.get("video_material")
+        if video_mat:
             st.session_state.research_history = [
                 *st.session_state.research_history,
                 {
@@ -634,13 +653,13 @@ if request and not st.session_state.is_running:
                 },
             ]
             save_history(st.session_state.research_history)
-        except Exception:
-            logger.exception("研究流程失敗")
-            st.error("研究失敗，請稍後再試。如果問題持續，請聯繫管理員。")
-            st.session_state.research_result = {
-                "error": "研究流程發生非預期錯誤",
-                "current_step": "error",
-            }
+    except Exception:
+        logger.exception("研究流程失敗")
+        status.update(label="❌ 研究失敗", state="error")
+        st.session_state.research_result = {
+            "error": "研究流程發生非預期錯誤",
+            "current_step": "error",
+        }
 
     st.session_state.is_running = False
     st.rerun()
@@ -664,8 +683,9 @@ if result is not None:
             for log in result.get("execution_log", []):
                 st.text(log)
 
-    elif result.get("error"):
-        st.error("研究失敗，請稍後再試。")
+    elif result.get("error") or result.get("current_step") == "error":
+        error_msg = result.get("error", "研究流程未能完成")
+        st.error(f"⚠️ {_esc(error_msg)}")
         with st.expander("📋 執行日誌", expanded=True):
             for log in result.get("execution_log", []):
                 st.text(log)
